@@ -9,9 +9,9 @@ import scipy as sp
 LOGGER = logging.getLogger(__name__)
 
 # Constants used in TrajOptLQR.
-DGD_MAX_ITER = 50
-DGD_MAX_LS_ITER = 20
-DGD_MAX_GD_ITER = 200
+DGD_MAX_ITER = 1
+DGD_MAX_LS_ITER = 1
+DGD_MAX_GD_ITER = 1
 
 ALPHA, BETA1, BETA2, EPS = 0.005, 0.9, 0.999, 1e-8  # Adam parameters
 

@@ -1,7 +1,6 @@
 """ This file defines the base trajectory optimization class. """
 import abc
 
-
 class TrajOpt(object):
     """ Trajectory optimization superclass. """
     __metaclass__ = abc.ABCMeta

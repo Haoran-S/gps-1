@@ -1,7 +1,6 @@
 """ This file interfaces to C++ iLQG-based trajectory optimization. """
 from gps.algorithm.traj_opt.traj_opt import TrajOpt
 
-
 class TrajOptLQR(TrajOpt):
     """ LQR trajectory optimization. """
     def __init__(self, hyperparams, dynamics):
