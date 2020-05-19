@@ -15,6 +15,7 @@ class IterationData(BundleType):
             'traj_distr': None,  # Initial trajectory distribution.
             'new_traj_distr': None, # Updated trajectory distribution.
             'cs': None,  # Sample costs of the current iteration.
+            'cs_to_print': None,  # Sample distance metric of the current iteration.
             'step_mult': 1.0,  # KL step multiplier for the current iteration.
             'eta': 1.0,  # Dual variable used in LQR backward pass.
         }

@@ -5,7 +5,6 @@ import numpy as np
 
 from gps.algorithm.algorithm import Algorithm
 
-
 LOGGER = logging.getLogger(__name__)
 
 

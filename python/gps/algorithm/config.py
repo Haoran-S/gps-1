@@ -2,7 +2,6 @@
 
 import numpy as np
 
-
 # Algorithm
 ALG = {
     'inner_iterations': 1,  # Number of iterations.
@@ -28,7 +27,10 @@ ALG = {
     # Whether or not to sample with neural net policy (only for badmm/mdgps).
     'sample_on_policy': False,
     # Inidicates if the algorithm requires fitting of the dynamics.
-    'fit_dynamics': True,    
+    'fit_dynamics': True,
+    'gamma': 1, #dual extra term parameter, add for DDR
+    'step_adjust': True,
+    'addcost': True
 }
 
 

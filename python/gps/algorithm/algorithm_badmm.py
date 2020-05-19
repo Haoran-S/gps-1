@@ -10,7 +10,6 @@ from gps.algorithm.algorithm_utils import PolicyInfo
 from gps.algorithm.config import ALG_BADMM
 from gps.sample.sample_list import SampleList
 
-
 LOGGER = logging.getLogger(__name__)
 
 

@@ -3,7 +3,6 @@
 import abc
 import copy
 import logging
-
 import random
 import numpy as np
 
@@ -11,6 +10,7 @@ from gps.algorithm.config import ALG
 from gps.algorithm.algorithm_utils import IterationData, TrajectoryInfo
 from gps.utility.general_utils import extract_condition
 
+#from gps.algorithm.cost.cost_state import CostState
 
 LOGGER = logging.getLogger(__name__)
 
@@ -45,6 +45,10 @@ class Algorithm(object):
         init_traj_distr['x0'] = agent.x0
         init_traj_distr['dX'] = agent.dX
         init_traj_distr['dU'] = agent.dU
+        
+        self.addcost = self._hyperparams['addcost']
+        
+        
         del self._hyperparams['agent']  # Don't want to pickle this.
 
         # IterationData objects for each condition.
@@ -71,12 +75,27 @@ class Algorithm(object):
                 hyperparams['cost'][i]['type'](hyperparams['cost'][i])
                 for i in range(self.M)
             ]
+            if self.addcost:
+                self.cost_to_print = [
+                    hyperparams['cost2'][i]['type'](hyperparams['cost2'][i])
+                    for i in range(self.M)
+                ]
         else:
             self.cost = [
                 hyperparams['cost']['type'](hyperparams['cost'])
                 for _ in range(self.M)
             ]
+            if self.addcost:
+                self.cost_to_print = [
+                    hyperparams['cost2']['type'](hyperparams['cost2'])
+                    for _ in range(self.M)
+                ]
+            
         self.base_kl_step = self._hyperparams['kl_step']
+        
+        self.gamma = self._hyperparams['gamma'] # dual extra term parameter, add for DDR
+        self.step_adjust = self._hyperparams['step_adjust'] # whether do step-adjust, add for DDR
+        
 
     @abc.abstractmethod
     def iteration(self, sample_list):
@@ -141,12 +160,17 @@ class Algorithm(object):
         cc = np.zeros((N, T))
         cv = np.zeros((N, T, dX+dU))
         Cm = np.zeros((N, T, dX+dU, dX+dU))
+        
+        cs_to_print = np.zeros((N, 1))
         for n in range(N):
             sample = self.cur[cond].sample_list[n]
             # Get costs.
             l, lx, lu, lxx, luu, lux = self.cost[cond].eval(sample)
             cc[n, :] = l
             cs[n, :] = l
+            
+            if self.addcost:
+                cs_to_print[n, :] = self.cost_to_print[cond].eval2(sample)
 
             # Assemble matrix and vector.
             cv[n, :, :] = np.c_[lx, lu]
@@ -172,6 +196,12 @@ class Algorithm(object):
         self.cur[cond].traj_info.Cm = np.mean(Cm, 0)  # Quadratic term (matrix).
 
         self.cur[cond].cs = cs  # True value of cost.
+        
+        if self.addcost:
+            self.cur[cond].cs_to_print = np.mean(cs_to_print)
+            LOGGER.debug('distance: %f', np.mean(cs_to_print))
+        else:
+            self.cur[cond].cs_to_print = 0
 
     def _advance_iteration_variables(self):
         """
