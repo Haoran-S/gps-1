@@ -60,7 +60,28 @@ class GMM(object):
         logobs = -0.5*np.ones((N, K))*D*np.log(2*np.pi)
         for i in range(K):
             mu, sigma = self.mu[i], self.sigma[i]
+             
+            
+#            if not np.all(np.linalg.eigvals(sigma) > 0):
+#                LOGGER.debug("======= postive")
+#            else:
+#                LOGGER.debug("======= non postive")
+#                sigma = sigma - np.amin(np.linalg.eigvalsh(sigma)) * np.identity(sigma.shape[0])
+                
+            
+#            LOGGER.debug(sigma)
+#            LOGGER.debug(np.linalg.eigvalsh(sigma))
+             
+            
+                
+             
+            
+            
             L = scipy.linalg.cholesky(sigma, lower=True)
+            
+            
+            
+            
             logobs[:, i] -= np.sum(np.log(np.diag(L)))
 
             diff = (data - mu).T

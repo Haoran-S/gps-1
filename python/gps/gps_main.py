@@ -1,7 +1,7 @@
 """ This file defines the main object that runs experiments. """
 
 import matplotlib as mpl
-mpl.use('Qt4Agg')
+mpl.use('TkAgg')
 
 import logging
 import imp
@@ -32,6 +32,8 @@ class GPSMain(object):
         """
         self._quit_on_end = quit_on_end
         self._hyperparams = config
+        
+        
         self._conditions = config['common']['conditions']
         if 'train_conditions' in config['common']:
             self._train_idx = config['common']['train_conditions']
@@ -390,6 +392,8 @@ def main():
     else:
         import random
         import numpy as np
+        import matplotlib
+        matplotlib.use('TkAgg')
         import matplotlib.pyplot as plt
 
         seed = hyperparams.config.get('random_seed', 0)

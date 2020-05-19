@@ -1,7 +1,6 @@
 """ This file defines the base policy optimization class. """
 import abc
 
-
 class PolicyOpt(object):
     """ Policy optimization superclass. """
     __metaclass__ = abc.ABCMeta
