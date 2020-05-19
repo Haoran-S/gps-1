@@ -8,7 +8,7 @@ import numpy as np
 from gps import __file__ as gps_filepath
 from gps.agent.box2d.agent_box2d import AgentBox2D
 from gps.agent.box2d.arm_world import ArmWorld
-from gps.algorithm.algorithm_badmm import AlgorithmBADMM
+from gps.algorithm.algorithm_mdgps import AlgorithmMDGPS
 from gps.algorithm.cost.cost_state import CostState
 from gps.algorithm.cost.cost_action import CostAction
 from gps.algorithm.cost.cost_sum import CostSum
@@ -31,7 +31,7 @@ SENSOR_DIMS = {
 }
 
 BASE_DIR = '/'.join(str.split(gps_filepath, '/')[:-2])
-EXP_DIR = BASE_DIR + '/../experiments/box2d_badmm_example/'
+EXP_DIR = BASE_DIR + '/../experiments/box2d_mdgps_example/'
 
 
 common = {
@@ -68,18 +68,13 @@ agent = {
 }
 
 algorithm = {
-    'type': AlgorithmBADMM,
+    'type': AlgorithmMDGPS,
     'conditions': common['conditions'],
     'iterations': 10,
-    'lg_step_schedule': np.array([1e-4, 1e-3, 1e-2, 1e-2]),
-    'policy_dual_rate': 0.2,
-    'ent_reg_schedule': np.array([1e-3, 1e-3, 1e-2, 1e-1]),
-    'fixed_lg_step': 3,
     'kl_step': 5.0,
     'min_step_mult': 0.01,
     'max_step_mult': 1.0,
-    'sample_decrease_var': 0.05,
-    'sample_increase_var': 0.1,
+    'policy_sample_mode': 'replace',
     'addcost': False,
 }
 

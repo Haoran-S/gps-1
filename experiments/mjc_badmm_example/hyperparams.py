@@ -1,6 +1,5 @@
 """ Hyperparameters for MJC peg insertion policy optimization. """
 from __future__ import division
-
 from datetime import datetime
 import os.path
 
@@ -11,12 +10,13 @@ from gps.agent.mjc.agent_mjc import AgentMuJoCo
 from gps.algorithm.algorithm_badmm import AlgorithmBADMM
 from gps.algorithm.cost.cost_fk import CostFK
 from gps.algorithm.cost.cost_action import CostAction
+from gps.algorithm.cost.cost_state import CostState
 from gps.algorithm.cost.cost_sum import CostSum
 from gps.algorithm.cost.cost_utils import RAMP_FINAL_ONLY
 from gps.algorithm.dynamics.dynamics_lr_prior import DynamicsLRPrior
 from gps.algorithm.dynamics.dynamics_prior_gmm import DynamicsPriorGMM
 from gps.algorithm.traj_opt.traj_opt_lqr_python import TrajOptLQRPython
-from gps.algorithm.policy_opt.policy_opt_caffe import PolicyOptCaffe
+#from gps.algorithm.policy_opt.policy_opt_caffe import PolicyOptCaffe
 from gps.algorithm.policy.lin_gauss_init import init_lqr
 from gps.algorithm.policy.policy_prior_gmm import PolicyPriorGMM
 from gps.algorithm.policy.policy_prior import PolicyPrior
@@ -26,7 +26,7 @@ from gps.proto.gps_pb2 import JOINT_ANGLES, JOINT_VELOCITIES, \
         END_EFFECTOR_POINTS, END_EFFECTOR_POINT_VELOCITIES, ACTION
 from gps.gui.config import generate_experiment_info
 
-ALGORITHM_NN_LIBRARY = "caffe"
+ALGORITHM_NN_LIBRARY = "tf"
 
 SENSOR_DIMS = {
     JOINT_ANGLES: 7,
@@ -66,6 +66,8 @@ agent = {
     'pos_body_idx': np.array([1]),
     'pos_body_offset': [[np.array([0.1, 0.1, 0])], [np.array([0.1, -0.1, 0])],
                         [np.array([-0.1, -0.1, 0])], [np.array([-0.1, 0.1, 0])]],
+#    'pos_body_offset': [[np.array([-0.08, -0.08, 0])], [np.array([-0.08, 0.08, 0])],
+#                        [np.array([0.08, 0.08, 0])], [np.array([0.08, -0.08, 0])]],
     'T': 100,
     'sensor_dims': SENSOR_DIMS,
     'state_include': [JOINT_ANGLES, JOINT_VELOCITIES, END_EFFECTOR_POINTS,
@@ -136,6 +138,23 @@ algorithm['cost'] = {
     'weights': [1.0, 1.0, 1.0],
 }
 
+cost_tgt = fk_cost['target_end_effector']
+cost_wt = np.array([1, 1, 1, 1, 1, 1])
+algorithm['cost2'] = {
+    'type': CostState,
+    'ramp_option': RAMP_FINAL_ONLY,
+    'l1': 0.0,
+    'l2': 2.0,
+    'alpha': 1e-5,
+    'data_types': {
+        END_EFFECTOR_POINTS: {
+            'target_state': cost_tgt,
+            'wp': cost_wt,
+        },
+    },
+}
+
+
 algorithm['dynamics'] = {
     'type': DynamicsLRPrior,
     'regularization': 1e-6,
@@ -149,6 +168,7 @@ algorithm['dynamics'] = {
 
 algorithm['traj_opt'] = {
     'type': TrajOptLQRPython,
+    'cons_per_step': True,
 }
 
 if ALGORITHM_NN_LIBRARY == "tf":

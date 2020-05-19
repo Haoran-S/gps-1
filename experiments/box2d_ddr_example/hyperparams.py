@@ -8,7 +8,7 @@ import numpy as np
 from gps import __file__ as gps_filepath
 from gps.agent.box2d.agent_box2d import AgentBox2D
 from gps.agent.box2d.arm_world import ArmWorld
-from gps.algorithm.algorithm_badmm import AlgorithmBADMM
+from gps.algorithm.algorithm_DDR import AlgorithmMDGPS
 from gps.algorithm.cost.cost_state import CostState
 from gps.algorithm.cost.cost_action import CostAction
 from gps.algorithm.cost.cost_sum import CostSum
@@ -31,11 +31,11 @@ SENSOR_DIMS = {
 }
 
 BASE_DIR = '/'.join(str.split(gps_filepath, '/')[:-2])
-EXP_DIR = BASE_DIR + '/../experiments/box2d_badmm_example/'
+EXP_DIR = BASE_DIR + '/../experiments/box2d_ddr_example/'
 
 
 common = {
-    'experiment_name': 'box2d_badmm_example' + '_' + \
+    'experiment_name': 'box2d_ddr_example' + '_' + \
             datetime.strftime(datetime.now(), '%m-%d-%y_%H-%M'),
     'experiment_dir': EXP_DIR,
     'data_files_dir': EXP_DIR + 'data_files/',
@@ -68,19 +68,16 @@ agent = {
 }
 
 algorithm = {
-    'type': AlgorithmBADMM,
+    'type': AlgorithmMDGPS,
     'conditions': common['conditions'],
     'iterations': 10,
-    'lg_step_schedule': np.array([1e-4, 1e-3, 1e-2, 1e-2]),
-    'policy_dual_rate': 0.2,
-    'ent_reg_schedule': np.array([1e-3, 1e-3, 1e-2, 1e-1]),
-    'fixed_lg_step': 3,
-    'kl_step': 5.0,
+    'kl_step': 1.0,
     'min_step_mult': 0.01,
-    'max_step_mult': 1.0,
-    'sample_decrease_var': 0.05,
-    'sample_increase_var': 0.1,
+    'max_step_mult': 3.0,
+    'policy_sample_mode': 'replace',
     'addcost': False,
+    'gamma': 0.1,
+    'step_adjust': True,
 }
 
 algorithm['init_traj_distr'] = {
@@ -128,6 +125,7 @@ algorithm['dynamics'] = {
 
 algorithm['traj_opt'] = {
     'type': TrajOptLQRPython,
+    'cons_per_step': True,
 }
 
 #algorithm['policy_opt'] = {

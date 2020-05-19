@@ -3,12 +3,11 @@ from __future__ import division
 
 from datetime import datetime
 import os.path
-
 import numpy as np
 
 from gps import __file__ as gps_filepath
 from gps.agent.mjc.agent_mjc import AgentMuJoCo
-from gps.algorithm.algorithm_mdgps import AlgorithmMDGPS
+from gps.algorithm.algorithm_DDR_true import AlgorithmDDR
 from gps.algorithm.cost.cost_fk import CostFK
 from gps.algorithm.cost.cost_action import CostAction
 from gps.algorithm.cost.cost_state import CostState
@@ -40,7 +39,7 @@ SENSOR_DIMS = {
 PR2_GAINS = np.array([3.09, 1.08, 0.393, 0.674, 0.111, 0.152, 0.098])
 
 BASE_DIR = '/'.join(str.split(gps_filepath, '/')[:-2])
-EXP_DIR = BASE_DIR + '/../experiments/mjc_mdgps_example/'
+EXP_DIR = BASE_DIR + '/../experiments/mjc_DDR/'
 
 common = {
     'experiment_name': 'my_experiment' + '_' + \
@@ -76,13 +75,15 @@ agent = {
 }
 
 algorithm = {
-    'type': AlgorithmMDGPS,
+    'type': AlgorithmDDR,
     'conditions': common['conditions'],
     'iterations': 12,
     'kl_step': 1.0,
     'min_step_mult': 0.5,
     'max_step_mult': 3.0,
     'policy_sample_mode': 'replace',
+    'gamma': 10,
+    'step_adjust': True,
 }
 
 algorithm['init_traj_distr'] = {
@@ -177,6 +178,7 @@ algorithm['dynamics'] = {
 
 algorithm['traj_opt'] = {
     'type': TrajOptLQRPython,
+    'cons_per_step': True,
 }
 
 #algorithm['policy_opt'] = {
